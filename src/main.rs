@@ -3,6 +3,8 @@ use std::thread;
 use std::fs::File;
 use std::io::prelude::*;
 
+use indicatif::ProgressBar;
+
 #[inline]
 fn check_if_even(n : u128) -> bool{
 	n & 1 == 0
@@ -18,62 +20,35 @@ fn if_odd(n : &mut u128){
 }
 
 fn main() {
-	let threads : u8;
-	let file_writer_handle : std::thread::JoinHandle<()>;
-	let max_number : u128;
 	let args: Vec<String> = std::env::args().collect();
+	let max_number : u128;
 	
 	if args.len() != 3{
-		println!("usage: rust_collatzconjecture_generator max_number threads");
+		println!("Usage : rcg \"result.csv\" 1000");
 		return;
 	}
-	max_number = args[1].parse().expect("Error in parsing input");
-	threads = args[2].parse().expect("Error in parsing input");
-	println!("Running on {} threads, max is {}.", threads, max_number);
+	let file_name : String = args[1].clone();
+	max_number = args[2].parse().expect("Error in parseing  to u128.");
+	let mut file = File::create(file_name).expect("Error in creating file");
 
-	{
-		let (tx, rx) = mpsc::channel::<(u128,u128)>();	
-		let mut handles : Vec<std::thread::JoinHandle<()>> = Vec::new();
+	let pb = ProgressBar::new((max_number/100) as u64);
 
-		file_writer_handle = thread::spawn(move || {
-			let mut file = File::create("result.csv").unwrap();
-			for message in rx.iter(){
-				file.write_all(format!("{},{}\n", message.0, message.1).as_bytes()).unwrap();
+	for i in 0..max_number{
+		let mut len = 0;
+		let mut number = i.clone();
+		while number > 1{
+			if check_if_even(number){
+				if_even(&mut number);
 			}
-		});
-
-		for n in 0..threads{
-			let tx_clone = tx.clone();
-			let thread_number = n.clone();
-			let threads = threads.clone();
-			let max_number = max_number.clone();
-
-			let handle = thread::spawn(move || {
-				for number in ((thread_number as u128)..max_number).step_by(threads as usize){
-					let mut n = number.clone();
-					let mut len = 1;
-					while n > 1{
-						if check_if_even(n){
-							if_even(&mut n);
-						}
-						else{
-							if_odd(&mut n);
-						}
-						len += 1;
-					}
-					tx_clone.send((number, len)).unwrap();
-				}
-				
-			});
-
-			handles.push(handle);
+			else{
+				if_odd(&mut number);
+			}
+			len += 1;
 		}
-		
-		for handle in handles{
-			handle.join().unwrap();
+		file.write_all(format!("{},{}", i, len).as_bytes()).expect("Could not write to file");
+		if i % 100 == 0{
+			pb.inc(1);
 		}
 	}
-	
-	file_writer_handle.join().unwrap();
-
+	pb.finish_with_message("done");
 }
