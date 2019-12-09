@@ -1,5 +1,3 @@
-use std::sync::mpsc;
-use std::thread;
 use std::fs::File;
 use std::io::prelude::*;
 
