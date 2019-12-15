@@ -43,7 +43,7 @@ fn main() {
 			}
 			len += 1;
 		}
-		file.write_all(format!("{},{}", i, len).as_bytes()).expect("Could not write to file");
+		file.write_all(format!("{},{}\n", i, len).as_bytes()).expect("Could not write to file");
 		if i % 100 == 0{
 			pb.inc(1);
 		}
