@@ -17,7 +17,7 @@ fn if_odd(n : &mut u128){
 
 fn main() {
 	let args: Vec<String> = std::env::args().collect();
-	let max_number : u128;
+	let max_number : usize;
 	
 	if args.len() != 3{
 		println!("Usage : rcg \"result.csv\" 1000");
@@ -25,11 +25,13 @@ fn main() {
 	}
 	let file_name : String = args[1].clone();
 	max_number = args[2].parse().expect("Error in parseing  to u128.");
-	let mut file = File::create(file_name).expect("Error in creating file");
+	
+	// Create buffer to store result in.
+	let mut buffer : Vec<u128> = Vec::with_capacity(max_number);
 
 	for i in 0..max_number{
-		let mut len = 0;
-		let mut number = i.clone();
+		let mut len : u128 = 0;
+		let mut number : u128 = i.clone() as u128;
 		while number > 1{
 			if check_if_even(number){
 				if_even(&mut number);
@@ -39,6 +41,14 @@ fn main() {
 			}
 			len += 1;
 		}
-		file.write_all(format!("{},{}\n", i, len).as_bytes()).expect("Could not write to file");
+		buffer.push(len);
+	}
+
+	// save buffer to file
+	let mut file = File::create(file_name).expect("Error in creating file");
+	
+	for n in 0..buffer.len(){
+		let element = buffer[n];
+		file.write(format!("{},{}\n", n, element).as_bytes()).expect("Error in writing to file.");
 	}
 }
