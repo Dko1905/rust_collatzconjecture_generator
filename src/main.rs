@@ -1,8 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
 
-use indicatif::ProgressBar;
-
 #[inline]
 fn check_if_even(n : u128) -> bool{
 	n & 1 == 0
@@ -29,8 +27,6 @@ fn main() {
 	max_number = args[2].parse().expect("Error in parseing  to u128.");
 	let mut file = File::create(file_name).expect("Error in creating file");
 
-	let pb = ProgressBar::new((max_number/100) as u64);
-
 	for i in 0..max_number{
 		let mut len = 0;
 		let mut number = i.clone();
@@ -44,9 +40,5 @@ fn main() {
 			len += 1;
 		}
 		file.write_all(format!("{},{}\n", i, len).as_bytes()).expect("Could not write to file");
-		if i % 100 == 0{
-			pb.inc(1);
-		}
 	}
-	pb.finish_with_message("done");
 }
