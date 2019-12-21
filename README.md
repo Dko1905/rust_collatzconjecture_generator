@@ -24,4 +24,4 @@ It's normal that it says `null device 1`.
 There is no docker, since I don't really know how to make one that takes user arguments.
 
 ## Licence
-[MIT]([www.google.com](https://opensource.org/licenses/MIT))
+[MIT](https://opensource.org/licenses/MIT)
