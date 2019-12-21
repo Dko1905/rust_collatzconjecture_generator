@@ -3,9 +3,6 @@ inputFilename <- commandArgs(trailingOnly = TRUE)[1]
 # Get output filename
 outputFilename <- commandArgs(trailingOnly = TRUE)[2]
 
-print(inputFilename)
-print(outputFilename)
-
 # read file into r
 data <- read.csv(file=inputFilename, header=FALSE, sep=",")
 # filename for result
